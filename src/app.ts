@@ -10,7 +10,6 @@ import path from "path";
 import compression from "compression";
 import logger from "./util/req-logger";
 import date from "date-and-time";
-import "./functions/cron/run";
 import morgan from "morgan";
 import fs from "fs";
 import { createStream } from "rotating-file-stream";
