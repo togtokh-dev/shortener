@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shortener</title>
+    <link rel="shortcut icon" href="./favicon.ico" />
+    <link rel="shortcut icon" href="./favicon.png" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.8/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.8"></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-200 font-sans text-gray-700">
+    <div class="container mx-auto p-8 flex">
+      <div class="max-w-md w-full mx-auto">
+        <h1 class="text-4xl text-center mb-12 font-thin">Shortener</h1>
+
+        <div class="bg-white rounded-lg overflow-hidden shadow-2xl">
+          <div class="p-8">
+            <form id="form" onsubmit="onSubmit">
+              <div class="mb-5">
+                <label
+                  for="Long"
+                  class="block mb-2 text-sm font-medium text-gray-600"
+                  >Long url</label
+                >
+
+                <input
+                  type="url"
+                  name="url"
+                  class="block w-full p-3 rounded bg-gray-200 border border-transparent focus:outline-none"
+                />
+              </div>
+            </form>
+            <div class="mb-5" id="short_url">
+              <label
+                for="Short"
+                class="block mb-2 text-sm font-medium text-gray-600"
+                >Short url</label
+              >
+
+              <input
+                id="short_url_value"
+                type="url"
+                name="Short"
+                class="block w-full p-3 rounded bg-gray-200 border border-transparent focus:outline-none"
+              />
+            </div>
+            <div class="mb-5" id="qr_show">
+              <div class="w-full">
+                <img
+                  src="https://www.investopedia.com/thmb/hJrIBjjMBGfx0oa_bHAgZ9AWyn0=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/qr-code-bc94057f452f4806af70fd34540f72ad.png"
+                  alt=""
+                  id="qr_value"
+                  class="bg-indigo-600 rounded-[20px] drop-shadow-2xl w-full"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+<script type="text/javascript">
+  $("#short_url").hide();
+  $("#qr_show").hide();
+
+  $("#form").on("submit", function (e) {
+    e.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "shortener/api/v1",
+      data: new FormData(this),
+      dataType: "json",
+      contentType: false,
+      cache: false,
+      processData: false,
+      beforeSend: function () {
+        $(".login100-form-btn").text("Waiting");
+        $(".login100-form-btn").prop("disabled", true);
+        $("#form").css("opacity", ".5");
+        $("#short_url").hide();
+      },
+      success: function (response) {
+        $(".login100-form-btn").prop("disabled", false);
+        $(".login100-form-btn").text("Shorten");
+        $("#form").css("opacity", "");
+        if (response.success) {
+          $("#short_url_value").val(location.href + response.data.short_url);
+          $("#short_url").show();
+          $("#qr_value").attr(
+            "src",
+            `${location.href}shortener/api/v1/qr/create?data=${location.href}${response.data.short_url}`
+          );
+          $("#qr_show").show();
+        }
+      },
+    });
+  });
+  $("#short_url_value").click(function () {
+    var copyText = document.getElementById("short_url_value");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+  });
+</script>
